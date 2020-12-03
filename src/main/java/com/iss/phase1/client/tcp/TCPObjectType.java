@@ -1,5 +1,7 @@
 package com.iss.phase1.client.tcp;
 
 public enum TCPObjectType {
-    DOCUMENT
+    DOCUMENT,
+    PUBLIC_KEY,
+    SESSION_KEY
 }

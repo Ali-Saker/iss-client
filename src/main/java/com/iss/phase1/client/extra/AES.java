@@ -10,9 +10,10 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class AES {
 
+    public static String issSecretKey = "ISS";
+
     public static SecretKeySpec generateKey() {
         try {
-            String issSecretKey = "ISS";
             byte[] key = issSecretKey.getBytes(StandardCharsets.UTF_8);
             MessageDigest sha = MessageDigest.getInstance("SHA-1");
             key = sha.digest(key);

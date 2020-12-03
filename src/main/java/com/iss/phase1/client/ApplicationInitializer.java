@@ -19,7 +19,7 @@ public class ApplicationInitializer implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws IOException {
+    public void run(String... args) throws IOException, ClassNotFoundException {
         this.tcpServer.run("localhost", 9999);
     }
 

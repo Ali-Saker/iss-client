@@ -2,13 +2,14 @@ package com.iss.phase1.client.tcp;
 
 import java.io.*;
 import java.net.Socket;
+import java.security.PublicKey;
 
 public class TCPConnection {
 
     private Socket clientSocket;
     private ObjectInputStream input;
     private ObjectOutputStream out;
-
+    private PublicKey serverPublicKey;
     public TCPConnection(Socket clientSocket, ObjectInputStream input, ObjectOutputStream out) {
         this.clientSocket = clientSocket;
         this.input = input;
@@ -46,5 +47,13 @@ public class TCPConnection {
 
     public TCPObject receive() throws IOException, ClassNotFoundException {
         return (TCPObject) input.readObject();
+    }
+
+    public PublicKey getServerPublicKey() {
+        return serverPublicKey;
+    }
+
+    public void setServerPublicKey(PublicKey serverPublicKey) {
+        this.serverPublicKey = serverPublicKey;
     }
 }
