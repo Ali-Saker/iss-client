@@ -1,5 +1,6 @@
 package com.iss.phase1.client.entity;
 
+import com.iss.phase1.client.extra.AES;
 import com.iss.phase1.client.extra.ActionType;
 
 import java.io.Serializable;
@@ -45,5 +46,25 @@ public class DocumentRequest implements Serializable {
 
     public void setUpdatedContent(String updatedContent) {
         this.updatedContent = updatedContent;
+    }
+
+    public DocumentRequest encryptName() {
+        this.documentName = AES.encrypt(this.documentName);
+        return this;
+    }
+
+    public DocumentRequest encryptContent() {
+        this.updatedContent = AES.encrypt(this.updatedContent);
+        return this;
+    }
+
+    public DocumentRequest decryptName() {
+        this.documentName = AES.decrypt(this.documentName);
+        return this;
+    }
+
+    public DocumentRequest decryptContent() {
+        this.updatedContent = AES.decrypt(this.updatedContent);
+        return this;
     }
 }

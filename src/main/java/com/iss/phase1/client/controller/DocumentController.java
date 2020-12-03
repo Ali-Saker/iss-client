@@ -35,17 +35,21 @@ public class DocumentController {
     @RequestMapping("/fetch")
     public String fetch(@ModelAttribute DocumentRequest request, Model model) throws IOException, ClassNotFoundException {
         request.setActionType(ActionType.FETCH);
+        request.encryptName();
         asyncService.send(tcpServer.getTcpConnection(), new TCPObject(TCPObjectType.DOCUMENT, request));
-        DocumentResponse response = asyncService.receiveDocument(tcpServer.getTcpConnection());
+        DocumentResponse response = asyncService.receiveDocument(tcpServer.getTcpConnection())
+                .decryptName().decryptContent();
         model.addAttribute("document", response);
         return "fetchResult";
     }
 
     @RequestMapping("/save")
     public String fetch(@ModelAttribute DocumentResponse document, Model model) throws IOException, ClassNotFoundException {
-        DocumentRequest request = new DocumentRequest(document.getName(), ActionType.EDIT, document.getContent());
+        DocumentRequest request = new DocumentRequest(document.getName(), ActionType.EDIT, document.getContent())
+                .encryptName().encryptContent();
         asyncService.send(tcpServer.getTcpConnection(), new TCPObject(TCPObjectType.DOCUMENT, request));
-        DocumentResponse response = asyncService.receiveDocument(tcpServer.getTcpConnection());
+        DocumentResponse response = asyncService.receiveDocument(tcpServer.getTcpConnection())
+                .decryptName().decryptContent();
         model.addAttribute("document", response);
         return "fetchResult";
     }
