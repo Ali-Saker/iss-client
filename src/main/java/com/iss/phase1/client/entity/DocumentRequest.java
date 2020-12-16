@@ -1,6 +1,5 @@
 package com.iss.phase1.client.entity;
 
-import com.iss.phase1.client.extra.AES;
 import com.iss.phase1.client.extra.ActionType;
 import com.iss.phase1.client.extra.DigitalSignature;
 

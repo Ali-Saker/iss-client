@@ -1,16 +1,26 @@
 package com.iss.phase1.client.extra;
 
-import java.security.PublicKey;
-import java.security.Signature;
+import java.security.*;
 
 public class DigitalSignature {
 
 
+    private static KeyPair keyPair;
+
+    static {
+        try {
+            final KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+            keyGen.initialize(1024);
+            keyPair = keyGen.generateKeyPair();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
     public static byte [] sign(String text) {
         byte [] signedText = null;
         try {
             Signature signature = Signature.getInstance("SHA256withRSA");
-            signature.initSign(RSA.getPrivateKey());
+            signature.initSign(getPrivateKey());
             signature.update(text.getBytes());
             signedText = signature.sign();
 
@@ -35,4 +45,13 @@ public class DigitalSignature {
         return isCorrect;
     }
 
+
+
+    public static PublicKey getPublicKey() {
+        return keyPair.getPublic();
+    }
+
+    public static PrivateKey getPrivateKey() {
+        return keyPair.getPrivate();
+    }
 }
