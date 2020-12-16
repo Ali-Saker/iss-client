@@ -1,8 +1,10 @@
 package com.iss.phase1.client.entity;
 
 import com.iss.phase1.client.extra.AES;
+import com.iss.phase1.client.extra.DigitalSignature;
 
 import java.io.Serializable;
+import java.security.PublicKey;
 
 public class DocumentResponse implements Serializable {
 
@@ -11,6 +13,10 @@ public class DocumentResponse implements Serializable {
     private String name;
 
     private String content;
+
+    private byte [] signedName;
+
+    private byte [] signedContent;
 
     public String getName() {
         return name;
@@ -28,23 +34,29 @@ public class DocumentResponse implements Serializable {
         this.content = content;
     }
 
-    public DocumentResponse encryptName() {
-        this.name = AES.encrypt(this.name);
+    public DocumentResponse signName() {
+        this.signedName = DigitalSignature.sign(this.name);
         return this;
     }
 
-    public DocumentResponse encryptContent() {
-        this.content = AES.encrypt(this.content);
+    public DocumentResponse signContent() {
+        this.signedContent = DigitalSignature.sign(this.content);
         return this;
     }
 
-    public DocumentResponse decryptName() {
-        this.name = AES.decrypt(this.name);
+    public DocumentResponse verifyName(PublicKey publicKey) {
+        boolean isCorrect = DigitalSignature.verify(this.name, this.signedName, publicKey);
+        if(!isCorrect) {
+            throw new RuntimeException("Unable to verify document response!");
+        }
         return this;
     }
 
-    public DocumentResponse decryptContent() {
-        this.content = AES.decrypt(this.content);
+    public DocumentResponse verifyContent(PublicKey publicKey) {
+        boolean isCorrect = DigitalSignature.verify(this.content, signedContent, publicKey);
+        if(!isCorrect) {
+            throw new RuntimeException("Unable to verify document response!");
+        }
         return this;
     }
 }

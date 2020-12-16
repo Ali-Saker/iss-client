@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.IOException;
+import java.security.PublicKey;
 
 @Controller
 @RequestMapping("/")
@@ -35,10 +36,12 @@ public class DocumentController {
     @RequestMapping("/fetch")
     public String fetch(@ModelAttribute DocumentRequest request, Model model) throws IOException, ClassNotFoundException {
         request.setActionType(ActionType.FETCH);
-        request.encryptName();
+        request.signName();
         asyncService.send(tcpServer.getTcpConnection(), new TCPObject(TCPObjectType.DOCUMENT, request));
+        PublicKey serverPublicKey = tcpServer.getTcpConnection().getServerPublicKey();
         DocumentResponse response = asyncService.receiveDocument(tcpServer.getTcpConnection())
-                .decryptName().decryptContent();
+                .verifyName(serverPublicKey).verifyContent(serverPublicKey);
+
         model.addAttribute("document", response);
         return "fetchResult";
     }
@@ -46,10 +49,11 @@ public class DocumentController {
     @RequestMapping("/save")
     public String fetch(@ModelAttribute DocumentResponse document, Model model) throws IOException, ClassNotFoundException {
         DocumentRequest request = new DocumentRequest(document.getName(), ActionType.EDIT, document.getContent())
-                .encryptName().encryptContent();
+                .signName().signContent();
         asyncService.send(tcpServer.getTcpConnection(), new TCPObject(TCPObjectType.DOCUMENT, request));
+        PublicKey serverPublicKey = tcpServer.getTcpConnection().getServerPublicKey();
         DocumentResponse response = asyncService.receiveDocument(tcpServer.getTcpConnection())
-                .decryptName().decryptContent();
+                .verifyName(serverPublicKey).verifyContent(serverPublicKey);
         model.addAttribute("document", response);
         return "fetchResult";
     }

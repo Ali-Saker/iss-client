@@ -3,6 +3,7 @@ package com.iss.phase1.client.extra;
 import javax.crypto.Cipher;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 
 public class RSA {
@@ -22,6 +23,10 @@ public class RSA {
 
     public static PublicKey getPublicKey() {
         return keyPair.getPublic();
+    }
+
+    public static PrivateKey getPrivateKey() {
+        return keyPair.getPrivate();
     }
 
     public static byte[] encrypt(byte[] text, PublicKey key) {

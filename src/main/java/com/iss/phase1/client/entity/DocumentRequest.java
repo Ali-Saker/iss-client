@@ -2,8 +2,10 @@ package com.iss.phase1.client.entity;
 
 import com.iss.phase1.client.extra.AES;
 import com.iss.phase1.client.extra.ActionType;
+import com.iss.phase1.client.extra.DigitalSignature;
 
 import java.io.Serializable;
+import java.security.PublicKey;
 
 public class DocumentRequest implements Serializable {
 
@@ -14,6 +16,10 @@ public class DocumentRequest implements Serializable {
     private ActionType actionType;
 
     private String updatedContent;
+
+    private byte [] signedDocumentName;
+
+    private byte [] signedUpdatedContent;
 
     public DocumentRequest() {
     }
@@ -48,23 +54,29 @@ public class DocumentRequest implements Serializable {
         this.updatedContent = updatedContent;
     }
 
-    public DocumentRequest encryptName() {
-        this.documentName = AES.encrypt(this.documentName);
+    public DocumentRequest signName() {
+        this.signedDocumentName = DigitalSignature.sign(this.documentName);
         return this;
     }
 
-    public DocumentRequest encryptContent() {
-        this.updatedContent = AES.encrypt(this.updatedContent);
+    public DocumentRequest signContent() {
+        this.signedUpdatedContent = DigitalSignature.sign(this.updatedContent);
         return this;
     }
 
-    public DocumentRequest decryptName() {
-        this.documentName = AES.decrypt(this.documentName);
+    public DocumentRequest verifyName(PublicKey publicKey) {
+        boolean isCorrect = DigitalSignature.verify(this.documentName, signedDocumentName, publicKey);
+        if(!isCorrect) {
+            throw new RuntimeException("Unable to verify document request!");
+        }
         return this;
     }
 
-    public DocumentRequest decryptContent() {
-        this.updatedContent = AES.decrypt(this.updatedContent);
+    public DocumentRequest verifyContent(PublicKey publicKey) {
+        boolean isCorrect = DigitalSignature.verify(this.updatedContent, signedUpdatedContent, publicKey);
+        if(!isCorrect) {
+            throw new RuntimeException("Unable to verify document request!");
+        }
         return this;
     }
 }
