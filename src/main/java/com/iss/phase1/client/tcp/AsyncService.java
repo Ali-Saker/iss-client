@@ -18,4 +18,6 @@ public class AsyncService {
         TCPObject data = (TCPObject)connection.receive();
         return (DocumentResponse) data.getObject();
     }
+
+
 }

@@ -6,6 +6,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.SignatureException;
 
 @Component
 public class ApplicationInitializer implements CommandLineRunner {
@@ -19,7 +21,7 @@ public class ApplicationInitializer implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws IOException, ClassNotFoundException {
+    public void run(String... args) throws IOException, ClassNotFoundException, SignatureException, InvalidKeyException {
         this.tcpServer.run("localhost", 9999);
     }
 

@@ -39,16 +39,27 @@ public class DocumentController {
         request.signName();
         asyncService.send(tcpServer.getTcpConnection(), new TCPObject(TCPObjectType.DOCUMENT, request));
         PublicKey serverPublicKey = tcpServer.getTcpConnection().getServerPublicKey();
-        DocumentResponse response = asyncService.receiveDocument(tcpServer.getTcpConnection())
+
+        TCPObject response = tcpServer.getTcpConnection().receive();
+
+        DocumentResponse documentResponse = ((DocumentResponse) response.getObject())
                 .verifyName(serverPublicKey).verifyContent(serverPublicKey);
 
-        model.addAttribute("document", response);
+        if(response.getType() == TCPObjectType.UNAUTHORIZED_EDIT) {
+            model.addAttribute("enableSave", false);
+        }
+
+        model.addAttribute("enableSave", !(response.getType() == TCPObjectType.UNAUTHORIZED_EDIT ||
+                response.getType() == TCPObjectType.UNAUTHORIZED_READ));
+
+        model.addAttribute("document", documentResponse);
+
         return "fetchResult";
     }
 
     @RequestMapping("/save")
     public String fetch(@ModelAttribute DocumentResponse document, Model model) throws IOException, ClassNotFoundException {
-        DocumentRequest request = new DocumentRequest(document.getName(), ActionType.EDIT, document.getContent())
+        DocumentRequest request = new DocumentRequest(document.getName(), ActionType.EDIT, document.getContent(), tcpServer.getTcpConnection().getClientCertificate())
                 .signName().signContent();
         asyncService.send(tcpServer.getTcpConnection(), new TCPObject(TCPObjectType.DOCUMENT, request));
         PublicKey serverPublicKey = tcpServer.getTcpConnection().getServerPublicKey();
